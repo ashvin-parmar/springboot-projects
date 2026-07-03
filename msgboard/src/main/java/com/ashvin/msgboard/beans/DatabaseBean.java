@@ -1,9 +1,6 @@
 package com.ashvin.msgboard.beans;
-/**
- * @author Ashvin
- * @since 2026-07-03
- * Description: 
- */
+
+
 public class DatabaseBean implements java.io.Serializable
 {
 private String driver;
@@ -49,4 +46,6 @@ public java.lang.String getPassword()
 {
 return this.password;
 }
+
 }
+

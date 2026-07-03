@@ -3,14 +3,13 @@ package com.ashvin.msgboard;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.*;
-import com.ashvin.msgboard.beans.*;
 import java.io.*;
 import com.google.gson.*;
+import com.ashvin.msgboard.beans.*;
 
 
 @SpringBootApplication
-public class MsgboardApplication 
-{
+public class MsgboardApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MsgboardApplication.class, args);

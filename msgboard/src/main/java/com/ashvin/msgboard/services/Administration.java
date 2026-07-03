@@ -1,12 +1,12 @@
 package com.ashvin.msgboard.services;
 
-import org.springframework.web.bind.annotation.*;       //@Controller
-import org.springframework.beans.factory.annotation.*;        //@AutoWired
-import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;   //@Autowired
+import org.springframework.stereotype.*;    //@Controller
+import org.springframework.web.bind.annotation.*;   //@GetMapping
 import com.ashvin.msgboard.beans.*;
 
 @Controller
-public class Administration 
+public class Administration
 {
 @Autowired
 private DatabaseBean databaseBean;
@@ -14,6 +14,6 @@ private DatabaseBean databaseBean;
 public String adminIndex()
 {
 if(databaseBean.getDriver()!=null) return "AdminIndex";
-return "Installation";
+return "Installer";
 }
 }
