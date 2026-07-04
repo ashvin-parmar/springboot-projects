@@ -9,6 +9,49 @@
         <title>Register - SB Admin</title>
         <link href="css/styles.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <script>
+          function validate(form)
+          {
+            var valid=true;
+            var jdbcDriver=form.driver.value.trim();
+            if(jdbcDriver.length==0) 
+            {
+              form.jdbcDriver.focus();
+              return false;
+            }
+            var connectionString=form.connectionString.value.trim();
+            if(connectionString.length==0)
+            {
+              form.connectionString.focus();
+              return false;
+            }
+            var username=form.username.value.trim();
+            if(username.length==0)
+            {
+              form.username.focus();
+              return false;
+            }
+            var password=form.password.value;
+            if(password.length==0)
+            {
+              form.password.focus();
+              return false;
+            }
+            var administratorUsername=form.administratorUsername.value.trim();
+            if(administratorUsername.length==0)
+            {
+              form.administratorUsername.focus();
+              return false;
+            }
+            var administratorPassword=form.administratorPassword.value;
+            if(administratorPassword.length==0)
+            {
+              form.administratorPassword.focus();
+              return false;
+            }
+          return true;
+          }
+        </script>
     </head>
     <body class="bg-primary">
         <div id="layoutAuthentication">
@@ -20,41 +63,40 @@
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header"><h3 class="text-center font-weight-light my-4">Create Account</h3></div>
                                     <div class="card-body">
-                                        <form>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating mb-3 mb-md-0">
-                                                        <input class="form-control" id="inputFirstName" type="text" placeholder="Enter your first name" />
-                                                        <label for="inputFirstName">First name</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input class="form-control" id="inputLastName" type="text" placeholder="Enter your last name" />
-                                                        <label for="inputLastName">Last name</label>
-                                                    </div>
-                                                </div>
+                                        <form method="POST" action="/install" onsubmit="return validate(this)">
+                                          <div>
+                                            <b>Database Installation</b>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="driver" type="text" name="driver" placeholder="com.mysql.cj.jdbc.Driver" required />
+                                                <label for="driver">JDBC Driver</label>
                                             </div>
                                             <div class="form-floating mb-3">
-                                                <input class="form-control" id="inputEmail" type="email" placeholder="name@example.com" />
-                                                <label for="inputEmail">Email address</label>
+                                              <input class="form-control" id="connectionString" name="connectionString" type="text" placeholder="jdbc:mysql:<host>:<port>/<db-name>" required />
+                                                <label for="connectionString">Connection string</label>
                                             </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating mb-3 mb-md-0">
-                                                        <input class="form-control" id="inputPassword" type="password" placeholder="Create a password" />
-                                                        <label for="inputPassword">Password</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating mb-3 mb-md-0">
-                                                        <input class="form-control" id="inputPasswordConfirm" type="password" placeholder="Confirm password" />
-                                                        <label for="inputPasswordConfirm">Confirm Password</label>
-                                                    </div>
-                                                </div>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="username" name="username" type="text" placeholder="username" required />
+                                                <label for="username">Username</label>
                                             </div>
+                                            <div class="form-floating mb-3">
+                                              <input class="form-control" id="password" name="password" type="password" placeholder="password" required />
+                                                <label for="password">Password</label>
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <b>Administrate</b>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="administratorUsername" name="administratorUsername" type="text" placeholder="Administrator username" required/>
+                                                <label for="administratorUsername">Administrator username</label>
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                              <input class="form-control" id="administratorPassword" name="administratorPassword" type="password" placeholder="Administrator password" required />
+                                                <label for="administratorPassword">Administrator password</label>
+                                            </div>
+                                          </div>
+
                                             <div class="mt-4 mb-0">
-                                                <div class="d-grid"><a class="btn btn-primary btn-block" href="login.html">Create Account</a></div>
+                                                <div class="d-grid"><button type='submit' class="btn btn-primary btn-block" >Create configuration</button></div>
                                             </div>
                                         </form>
                                     </div>

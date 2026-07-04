@@ -1,6 +1,1 @@
-{
-"driver":"abcd",
-"connectionString":"efgh",
-"username":"i",
-"password":"zyw"
-}
+{"driver":"com.mysql.cj.jdbc.Driver","connectionString":"jdbc:mysql://localhost:3306/msgboard_db","username":"msgboarduser1","password":"msgboard#User1"}
