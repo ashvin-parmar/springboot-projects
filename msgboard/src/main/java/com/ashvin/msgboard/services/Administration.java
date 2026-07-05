@@ -3,10 +3,15 @@ package com.ashvin.msgboard.services;
 import org.springframework.beans.factory.annotation.*;   //@Autowired
 import org.springframework.stereotype.*;    //@Controller
 import org.springframework.web.bind.annotation.*;   //@GetMapping
+
 import com.ashvin.msgboard.beans.*;
-import java.sql.*;
+import com.ashvin.msgboard.utils.*;
+import com.ashvin.msgboard.dto.*;
+import com.ashvin.msgboard.dao.*;
+
 import java.io.*;
 import com.google.gson.*;
+import java.util.*;
 
 @Controller
 public class Administration
@@ -26,19 +31,21 @@ System.out.println(driver);
 try
 {
 Class.forName(driver);
-Connection connection=DriverManager.getConnection(connectionString,username,password);
-if(connection==null) return "InstallationFailed";
-System.out.println("Connection establish");
+DAOConnection.driver=driver;
+DAOConnection.connectionString=connectionString;
+DAOConnection.username=username;
+DAOConnection.password=password;
 
-//table create [pending]
+DatabaseUtility.createTables();
+AdministratorDAO administratorDAO=new AdministratorDAO();
+Administrator administrator=new Administrator();
+administrator.setUsername(administratorUsername);
+administrator.setPassword(administratorPassword);
+String administratorPasswordKey=UUID.randomUUID().toString();
+System.out.println("Key: "+administratorPasswordKey);
+administrator.setPasswordKey(administratorPasswordKey);
+administratorDAO.add(administrator);
 
-PreparedStatement preparedStatement=connection.prepareStatement("insert into administrator (username,password,password_id) values(?,?,?)");
-preparedStatement.setString(1,administratorUsername);
-preparedStatement.setString(2,administratorPassword);
-preparedStatement.setString(3,administratorPassword);
-preparedStatement.executeUpdate();
-preparedStatement.close();
-connection.close();
 System.out.println("administrator info added to table");
 
 //conf/db.json created
