@@ -86,21 +86,4 @@ System.out.println(exception);
 throw new DAOException("Unable to encrypt your data");
 }
 }
-public static void main(String args[])
-{
-try
-{
-String data="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrtsuvwxyz1234567890";
-System.out.println("Data: "+data);
-String key=EncryptionUtility.getKey();
-System.out.println("Key: "+key);
-String encryptedData=EncryptionUtility.encrypt(data,key);
-System.out.println("EncryptedData: "+encryptedData);
-String decryptedData=EncryptionUtility.decrypt(encryptedData,key);
-System.out.println("DecryptedData: "+decryptedData);
-}catch(DAOException dao)
-{
-System.out.println(dao);
-}
-}
 }

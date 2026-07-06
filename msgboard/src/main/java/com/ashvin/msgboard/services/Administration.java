@@ -27,7 +27,7 @@ return "Installer";
 @PostMapping("/install")
 public String installMessageBoard(@RequestParam String driver,@RequestParam String connectionString,@RequestParam String username,@RequestParam String password,@RequestParam String administratorUsername,@RequestParam String administratorPassword)
 {
-System.out.println(driver);
+//System.out.println(driver);
 try
 {
 Class.forName(driver);
@@ -40,13 +40,14 @@ DatabaseUtility.createTables();
 AdministratorDAO administratorDAO=new AdministratorDAO();
 Administrator administrator=new Administrator();
 administrator.setUsername(administratorUsername);
-administrator.setPassword(administratorPassword);
-String administratorPasswordKey=UUID.randomUUID().toString();
-System.out.println("Key: "+administratorPasswordKey);
+String administratorPasswordKey=EncryptionUtility.getKey();
+String encryptedAdministratorPassword=EncryptionUtility.encrypt(administratorPassword,administratorPasswordKey);
+administrator.setPassword(encryptedAdministratorPassword);
 administrator.setPasswordKey(administratorPasswordKey);
+
 administratorDAO.add(administrator);
 
-System.out.println("administrator info added to table");
+//System.out.println("administrator info added to table");
 
 //conf/db.json created
 File file=new File("conf"+File.separator+"db.json");
