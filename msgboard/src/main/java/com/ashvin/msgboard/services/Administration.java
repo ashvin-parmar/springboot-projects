@@ -68,4 +68,31 @@ System.out.println(exception.getMessage());
 return "InstallationFailed";
 }
 }
+@ResponseBody
+@PostMapping("/addBranch")
+public ActionResponse addBranch(BranchBean branchBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+String name=branchBean.getName();
+if(name==null || name.isBlank()) throw new DAOException("branch name required");
+
+Branch branch=new Branch();
+branch.setName(name);
+BranchDAO branchDAO=new BranchDAO();
+branchDAO.add(branch);
+Integer code=branch.getCode();
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(code);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
 }

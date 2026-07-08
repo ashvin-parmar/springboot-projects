@@ -13,10 +13,21 @@ try
 Statement statement;
 String sqlStatement="";
 
+sqlStatement="create table administrator";
+sqlStatement+="(";
+sqlStatement+="username char(15) not null primary key,";
+sqlStatement+="password char(100) not null,";
+sqlStatement+="password_key char(100) not null";
+sqlStatement+=");";
+
+statement=connection.createStatement();
+statement.executeUpdate(sqlStatement);
+statement.close();
+
 sqlStatement="create table branch";
 sqlStatement+="(";
 sqlStatement+="code int primary key auto_increment,";
-sqlStatement+="title char(50) not null unique";
+sqlStatement+="name char(50) not null unique";
 sqlStatement+=");";
 
 statement=connection.createStatement();
@@ -26,18 +37,7 @@ statement.close();
 sqlStatement="create table semester";
 sqlStatement+="(";
 sqlStatement+="code int primary key auto_increment,";
-sqlStatement+="title char(25) not null unique";
-sqlStatement+=");";
-
-statement=connection.createStatement();
-statement.executeUpdate(sqlStatement);
-statement.close();
-
-sqlStatement="create table administrator";
-sqlStatement+="(";
-sqlStatement+="username char(15) not null primary key,";
-sqlStatement+="password char(100) not null,";
-sqlStatement+="password_key char(100) not null";
+sqlStatement+="name char(25) not null unique";
 sqlStatement+=");";
 
 statement=connection.createStatement();
