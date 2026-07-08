@@ -95,4 +95,198 @@ actionResponse.setResult(null);
 }
 return actionResponse;
 }
+
+@ResponseBody
+@PostMapping("/updateBranch")
+public ActionResponse updateBranch(BranchBean branchBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+int code=branchBean.getCode();
+if(code<=0) throw new DAOException("invalid branch data provided, not found");
+String name=branchBean.getName();
+if(name==null || name.isBlank()) throw new DAOException("branch name required");
+
+Branch branch=new Branch();
+branch.setCode(code);
+branch.setName(name);
+BranchDAO branchDAO=new BranchDAO();
+branchDAO.update(branch);
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/deleteBranch")
+public ActionResponse deleteBranch(BranchBean branchBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+int code=branchBean.getCode();
+if(code<=0) throw new DAOException("invalid branch data provided, not found");
+
+BranchDAO branchDAO=new BranchDAO();
+branchDAO.delete(code);
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/getBranches")
+public ActionResponse getBranches()
+{
+ActionResponse actionResponse=new ActionResponse();
+List<BranchBean> branchesBean=new ArrayList<>();
+try
+{
+BranchDAO branchDAO=new BranchDAO();
+List<Branch> branches=branchDAO.getBranches();
+BranchBean branchBean;
+for(Branch branch:branches)
+{
+branchBean=new BranchBean();
+branchBean.setCode(branch.getCode());
+branchBean.setName(branch.getName());
+branchesBean.add(branchBean);
+}
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(branchesBean);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(branchesBean);
+}
+return actionResponse;
+}
+
+
+
+@ResponseBody
+@PostMapping("/addSemester")
+public ActionResponse addSemester(SemesterBean semesterBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+String name=semesterBean.getName();
+if(name==null || name.isBlank()) throw new DAOException("semester name required");
+
+Semester semester=new Semester();
+semester.setName(name);
+SemesterDAO semesterDAO=new SemesterDAO();
+semesterDAO.add(semester);
+Integer code=semester.getCode();
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(code);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/updateSemester")
+public ActionResponse updateSemester(SemesterBean semesterBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+int code=semesterBean.getCode();
+if(code<=0) throw new DAOException("invalid semester data provided, not found");
+String name=semesterBean.getName();
+if(name==null || name.isBlank()) throw new DAOException("semester name required");
+
+Semester semester=new Semester();
+semester.setCode(code);
+semester.setName(name);
+SemesterDAO semesterDAO=new SemesterDAO();
+semesterDAO.update(semester);
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/deleteSemester")
+public ActionResponse deleteSemester(SemesterBean semesterBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+int code=semesterBean.getCode();
+if(code<=0) throw new DAOException("invalid semester data provided, not found");
+
+SemesterDAO semesterDAO=new SemesterDAO();
+semesterDAO.delete(code);
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/getSemesters")
+public ActionResponse getSemesters()
+{
+ActionResponse actionResponse=new ActionResponse();
+List<SemesterBean> semesterBeans=new ArrayList<>();
+try
+{
+SemesterDAO semesterDAO=new SemesterDAO();
+SemesterBean semesterBean;
+List<Semester> semesters=semesterDAO.getSemesters();
+for(Semester semester:semesters)
+{
+semesterBean=new SemesterBean();
+semesterBean.setCode(semester.getCode());
+semesterBean.setName(semester.getName());
+semesterBeans.add(semesterBean);
+}
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(semesterBeans);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(semesterBeans);
+}
+return actionResponse;
+}
+
 }
