@@ -1,8 +1,8 @@
 -- 3: third to source
 
-insert into branch (title) values("Electronics & Telecommunication");
+insert into branch (name) values("Electronics & Telecommunication");
 
-insert into semester (title) value("VII");
+insert into semester (name) value("VII");
 
 insert into student (roll_number,first_name,last_name,email_id,password,password_id) values("A10010","Rohit","Solanki","rohittemp@gmail.com","rohitpass","rohitpass");
 

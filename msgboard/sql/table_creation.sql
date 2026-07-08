@@ -1,14 +1,21 @@
 -- 1: First to source
+create table administrator
+(
+username char(15) not null primary key,
+password char(100) not null,
+password_id char(100) not null
+);
+
 create table branch
 (
 code int primary key auto_increment,
-title char(50) not null unique
+name char(50) not null unique
 );
 
 create table semester
 (
 code int primary key auto_increment,
-title char(25) not null unique
+name char(25) not null unique
 );
 
 create table student
@@ -21,9 +28,3 @@ password char(100) not null,
 password_id char(100) not null
 );
 
-create table administrator
-(
-username char(15) not null primary key,
-password char(100) not null,
-password_id char(100) not null
-);
