@@ -259,6 +259,7 @@ actionResponse.setResult(null);
 }
 return actionResponse;
 }
+
 @ResponseBody
 @PostMapping("/getSemesters")
 public ActionResponse getSemesters()
@@ -289,4 +290,27 @@ actionResponse.setResult(semesterBeans);
 return actionResponse;
 }
 
+@PostMapping("/authenticateAdministrator")
+public String authenticateAdministrator(AdministratorBean administratorBean)
+{
+boolean invalid=false;
+if(administratorBean==null) invalid=true;
+String username=administratorBean.getUsername();
+String password=administratorBean.getPassword();
+if(username==null || password==null || username.isBlank() || password.isBlank()) invalid=true;
+if(invalid) return "AdminIndex";
+try
+{
+AdministratorDAO administratorDAO=new AdministratorDAO();
+Administrator administrator=new Administrator();
+administrator.setUsername(username);
+administrator.setPassword(password);
+if(administratorDAO.verifyUsernamePassword(administrator)) return "Home";
+return "AdminIndex";
+}catch(DAOException daoException)
+{
+System.out.println(daoException);
+return "AdminIndex";
+}
+}
 }
