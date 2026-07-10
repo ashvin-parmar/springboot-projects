@@ -8,6 +8,11 @@ public Branch()
 {
 //do nothing
 }
+public Branch(int code,String name)
+{
+this.code=code;
+this.name=name;
+}
 public void setCode(int code)
 {
 this.code=code;

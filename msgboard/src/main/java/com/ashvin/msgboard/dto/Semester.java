@@ -8,6 +8,11 @@ public Semester()
 {
 //do nothing
 }
+public Semester(int code,String name)
+{
+this.code=code;
+this.name=name;
+}
 public void setCode(int code)
 {
 this.code=code;
