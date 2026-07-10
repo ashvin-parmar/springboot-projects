@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.*;   //@Autowired
 import org.springframework.stereotype.*;    //@Controller
 import org.springframework.web.bind.annotation.*;   //@GetMapping
 
-import com.ashvin.msgboard.beans.*;
 import com.ashvin.msgboard.utils.*;
+import com.ashvin.msgboard.beans.*;
 import com.ashvin.msgboard.dto.*;
 import com.ashvin.msgboard.dao.*;
 
@@ -18,6 +18,7 @@ public class Administration
 {
 @Autowired
 private DatabaseBean databaseBean;
+private Gson gson=new Gson();
 @GetMapping("/admin")
 public String adminIndex()
 {
@@ -313,4 +314,311 @@ System.out.println(daoException);
 return "AdminIndex";
 }
 }
+
+@ResponseBody
+@PostMapping("/student/add")
+public ActionResponse addStudent(StudentBean studentBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+boolean valid=true;
+String firstName=studentBean.getFirstName();
+String lastName=studentBean.getLastName();
+String rollNumber=null;
+String emailID=studentBean.getEmailID();
+String password=studentBean.getPassword();
+int branchCode=studentBean.getBranchCode();
+int semesterCode=studentBean.getSemesterCode();
+if(firstName==null || firstName.isBlank()) valid=false;
+if(lastName==null || lastName.isBlank()) valid=false;
+if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
+if(password==null || password.isBlank()) valid=false;
+if(branchCode<=0) valid=false;
+if(semesterCode<=0) valid=false;
+//More validation later on
+if(!valid)      // error management is not perfect, changes later on
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("invalid student data provided");
+actionResponse.setResult(null);
+return actionResponse;
+}
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+Student student=new Student();
+student.setFirstName(firstName);
+student.setLastName(lastName);
+student.setEmailID(emailID);
+student.setPassword(password);
+student.setBranchCode(branchCode);
+student.setSemesterCode(semesterCode);
+studentDAO.add(student);
+rollNumber=student.getRollNumber();
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(rollNumber);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
+@ResponseBody
+@PostMapping("/stuedent/update")
+public ActionResponse updateStudent(StudentBean studentBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+boolean valid=true;
+String firstName=studentBean.getFirstName();
+String lastName=studentBean.getLastName();
+String rollNumber=studentBean.getRollNumber();
+String password=studentBean.getPassword();
+String emailID=studentBean.getEmailID();
+int branchCode=studentBean.getBranchCode();
+int semesterCode=studentBean.getSemesterCode();
+if(firstName==null || firstName.isBlank()) valid=false;
+if(lastName==null || lastName.isBlank()) valid=false;
+if(rollNumber==null || rollNumber.isBlank()) valid=false;
+if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
+if(password==null || password.isBlank()) valid=false;
+if(branchCode<=0) valid=false;
+if(semesterCode<=0) valid=false;
+//More validation later on
+if(!valid)      // error management is not perfect, changes later on
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("invalid student data provided");
+actionResponse.setResult(null);
+return actionResponse;
+}
+
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+Student student=new Student();
+student.setRollNumber(rollNumber);
+student.setFirstName(firstName);
+student.setLastName(lastName);
+student.setEmailID(emailID);
+student.setPassword(password);
+student.setBranchCode(branchCode);
+student.setSemesterCode(semesterCode);
+studentDAO.update(student);
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
+@ResponseBody
+@PostMapping("/stuedent/delete")
+public ActionResponse deleteStudent(StudentBean studentBean)
+{
+ActionResponse actionResponse=new ActionResponse();
+boolean valid=true;
+String rollNumber=studentBean.getRollNumber();
+String password=studentBean.getPassword();
+String emailID=studentBean.getEmailID();
+if(rollNumber==null || rollNumber.isBlank()) valid=false;
+if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
+if(password==null || password.isBlank()) valid=false;
+//More validation later on
+if(!valid)      // error management is not perfect, changes later on
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("invalid student data provided");
+actionResponse.setResult(null);
+return actionResponse;
+}
+
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+Student student=new Student();
+student.setRollNumber(rollNumber);
+student.setEmailID(emailID);
+student.setPassword(password);
+studentDAO.delete(student);
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(null);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
+@ResponseBody
+@PostMapping("/stuedent/getAll")
+public ActionResponse getAllStudent()
+{
+ActionResponse actionResponse=new ActionResponse();
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+List<StudentView> students=studentDAO.getStudents();
+
+List<StudentViewBean> studentBeans=new ArrayList<>();
+studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(studentBeans);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
+@ResponseBody
+@PostMapping("/stuedent/getByRollNumber")
+public ActionResponse getStudentByRollNumber(@RequestParam("rollNumber")String rollNumber)
+{
+ActionResponse actionResponse=new ActionResponse();
+if(rollNumber==null || rollNumber.isBlank())
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("roll number required");
+actionResponse.setResult(null);
+return actionResponse;
+}
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+StudentView studentView=studentDAO.getStudentByRollNumber(rollNumber);
+
+StudentViewBean studentViewBean=null;
+studentViewBean=gson.fromJson(gson.toJson(studentView),StudentViewBean.class);
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(studentViewBean);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
+@ResponseBody
+@PostMapping("/stuedent/getByBranch")
+public ActionResponse getStudentByBranch(@RequestParam("branchCode") int branchCode)
+{
+ActionResponse actionResponse=new ActionResponse();
+if(branchCode<=0)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("student branch required");
+actionResponse.setResult(null);
+return actionResponse;
+}
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+List<StudentView> students=studentDAO.getStudentsByBranchCode(branchCode);
+
+List<StudentViewBean> studentBeans=new ArrayList<>();
+studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(studentBeans);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/stuedent/getBySemester")
+public ActionResponse getStudentBySemester(@RequestParam("semesterCode") int semesterCode)
+{
+ActionResponse actionResponse=new ActionResponse();
+if(semesterCode<=0)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("student semester required");
+actionResponse.setResult(null);
+return actionResponse;
+}
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+List<StudentView> students=studentDAO.getStudentsBySemesterCode(semesterCode);
+
+List<StudentViewBean> studentBeans=new ArrayList<>();
+studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(studentBeans);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+@ResponseBody
+@PostMapping("/stuedent/getByBranchAndSemester")
+public ActionResponse getStudentByBranchAndSemester(@RequestParam("branchCode") int branchCode,@RequestParam("semesterCode") int semesterCode)
+{
+ActionResponse actionResponse=new ActionResponse();
+if(branchCode<=0)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("student branch required");
+actionResponse.setResult(null);
+return actionResponse;
+}
+if(semesterCode<=0)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException("student semester required");
+actionResponse.setResult(null);
+return actionResponse;
+}
+try
+{
+StudentDAO studentDAO=new StudentDAO();
+List<StudentView> students=studentDAO.getStudentsByBranchAndSemesterCode(branchCode,semesterCode);
+
+List<StudentViewBean> studentBeans=new ArrayList<>();
+studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+
+actionResponse.setSuccess(true);
+actionResponse.setException(null);
+actionResponse.setResult(studentBeans);
+}catch(DAOException daoException)
+{
+actionResponse.setSuccess(false);
+actionResponse.setException(daoException.getMessage());
+actionResponse.setResult(null);
+}
+return actionResponse;
+}
+
 }
