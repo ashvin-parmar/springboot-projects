@@ -1,0 +1,9 @@
+
+### Student - Add Service
+POST http://localhost:8080/student/add?firstName=Lokesh&lastName=Khanna&emailID=lokeshtemp@gmail.com&password=abcdef12&branchCode=1&semesterCode=1
+
+### Student - Update Service
+POST http://localhost:8080/student/update?firstName=Lokesh&lastName=Khanna&emailID=lokeshtemp@gmail.com&password=abcdef12&branchCode=1&semesterCode=1
+
+### Student - Delete Service
+POST http://localhost:8080/student/delete?firstName=Lucky&lastName=Patidar&emailID=lokeshtemp@gmail.com&password=abcdef12&branchCode=1&semesterCode=1

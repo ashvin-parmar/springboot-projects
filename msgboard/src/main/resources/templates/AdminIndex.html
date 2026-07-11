@@ -20,7 +20,7 @@
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
                                     <div class="card-body">
-                                        <form method="POST" action="/authenticateAdministrator">
+                                        <form method="POST" action="/login">
                                             <div class="form-floating mb-3">
                                                 <input class="form-control" id="username" name="username" type="text" placeholder="username" />
                                                 <label for="Username">Username</label>
@@ -28,6 +28,9 @@
                                             <div class="form-floating mb-3">
                                                 <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" />
                                                 <label for="inputPassword">Password</label>
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                              <span th:if="${error}" style="color:red">${error}</span>
                                             </div>
                                             <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                                                 <button type="submit" class="btn btn-primary">Login</button>

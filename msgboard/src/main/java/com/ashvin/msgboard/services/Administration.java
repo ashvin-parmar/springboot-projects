@@ -3,6 +3,10 @@ package com.ashvin.msgboard.services;
 import org.springframework.beans.factory.annotation.*;   //@Autowired
 import org.springframework.stereotype.*;    //@Controller
 import org.springframework.web.bind.annotation.*;   //@GetMapping
+import org.springframework.ui.*;    //Model
+
+import jakarta.servlet.*;
+import jakarta.servlet.http.*; 
 
 import com.ashvin.msgboard.utils.*;
 import com.ashvin.msgboard.beans.*;
@@ -11,6 +15,8 @@ import com.ashvin.msgboard.dao.*;
 
 import java.io.*;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.util.*;
 
 @Controller
@@ -291,29 +297,62 @@ actionResponse.setResult(semesterBeans);
 return actionResponse;
 }
 
-@PostMapping("/authenticateAdministrator")
-public String authenticateAdministrator(AdministratorBean administratorBean)
+@PostMapping("/login")
+public String authenticateAdministrator(@RequestParam("username")String username,@RequestParam("password")String password,Model model,HttpServletRequest rq)
 {
-boolean invalid=false;
-if(administratorBean==null) invalid=true;
-String username=administratorBean.getUsername();
-String password=administratorBean.getPassword();
-if(username==null || password==null || username.isBlank() || password.isBlank()) invalid=true;
-if(invalid) return "AdminIndex";
+if(username==null || password==null || username.isBlank() || password.isBlank()) 
+{
+model.addAttribute("error","invalid username/password");
+return "AdminIndex";
+}
 try
 {
 AdministratorDAO administratorDAO=new AdministratorDAO();
 Administrator administrator=new Administrator();
 administrator.setUsername(username);
 administrator.setPassword(password);
-if(administratorDAO.verifyUsernamePassword(administrator)) return "Home";
+if(administratorDAO.verifyUsernamePassword(administrator)) 
+{
+HttpSession ss=rq.getSession();
+ss.setAttribute("username",username);
+return "Home";
+}
+model.addAttribute("error","invalid username/password");
 return "AdminIndex";
 }catch(DAOException daoException)
 {
 System.out.println(daoException);
+model.addAttribute("error","invalid username/password");
 return "AdminIndex";
 }
 }
+@ResponseBody
+@PostMapping("/validateAdministratorLogin")
+public String validateAuthenticateAdministratorLogin(HttpSession ss,HttpServletRequest request,HttpServletResponse response)
+{
+try
+{
+if(ss==null) request.getRequestDispatcher("/admin").forward(request, response);
+String username=(String)ss.getAttribute("username");
+if(username==null || username.isBlank()) request.getRequestDispatcher("/admin").forward(request, response);
+return username;
+}catch(IOException ioException)
+{
+System.out.println(ioException);
+}catch(ServletException servletException)
+{
+System.out.println(servletException);
+}
+return "";
+}
+
+@PostMapping("/logout")
+public String logoutAdministrator(HttpSession ss)
+{
+if(ss!=null) ss.invalidate();
+return "/admin";
+}
+
 
 @ResponseBody
 @PostMapping("/student/add")
@@ -368,7 +407,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/stuedent/update")
+@PostMapping("/student/update")
 public ActionResponse updateStudent(StudentBean studentBean)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -422,7 +461,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/stuedent/delete")
+@PostMapping("/student/delete")
 public ActionResponse deleteStudent(StudentBean studentBean)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -464,7 +503,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/stuedent/getAll")
+@PostMapping("/student/getAll")
 public ActionResponse getAllStudent()
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -473,8 +512,9 @@ try
 StudentDAO studentDAO=new StudentDAO();
 List<StudentView> students=studentDAO.getStudents();
 
-List<StudentViewBean> studentBeans=new ArrayList<>();
-studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+List<StudentViewBean> studentBeans=null;
+Type listType = new TypeToken<List<StudentViewBean>>(){}.getType();
+studentBeans=gson.fromJson(gson.toJson(students),listType);
 
 actionResponse.setSuccess(true);
 actionResponse.setException(null);
@@ -489,7 +529,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/stuedent/getByRollNumber")
+@PostMapping("/student/getByRollNumber")
 public ActionResponse getStudentByRollNumber(@RequestParam("rollNumber")String rollNumber)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -521,7 +561,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/stuedent/getByBranch")
+@PostMapping("/student/getByBranch")
 public ActionResponse getStudentByBranch(@RequestParam("branchCode") int branchCode)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -537,8 +577,9 @@ try
 StudentDAO studentDAO=new StudentDAO();
 List<StudentView> students=studentDAO.getStudentsByBranchCode(branchCode);
 
-List<StudentViewBean> studentBeans=new ArrayList<>();
-studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+List<StudentViewBean> studentBeans=null;
+Type listType = new TypeToken<List<StudentViewBean>>(){}.getType();
+studentBeans=gson.fromJson(gson.toJson(students),listType);
 
 actionResponse.setSuccess(true);
 actionResponse.setException(null);
@@ -552,7 +593,7 @@ actionResponse.setResult(null);
 return actionResponse;
 }
 @ResponseBody
-@PostMapping("/stuedent/getBySemester")
+@PostMapping("/student/getBySemester")
 public ActionResponse getStudentBySemester(@RequestParam("semesterCode") int semesterCode)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -568,8 +609,9 @@ try
 StudentDAO studentDAO=new StudentDAO();
 List<StudentView> students=studentDAO.getStudentsBySemesterCode(semesterCode);
 
-List<StudentViewBean> studentBeans=new ArrayList<>();
-studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+List<StudentViewBean> studentBeans=null;
+Type listType = new TypeToken<List<StudentViewBean>>(){}.getType();
+studentBeans=gson.fromJson(gson.toJson(students),listType);
 
 actionResponse.setSuccess(true);
 actionResponse.setException(null);
@@ -583,7 +625,7 @@ actionResponse.setResult(null);
 return actionResponse;
 }
 @ResponseBody
-@PostMapping("/stuedent/getByBranchAndSemester")
+@PostMapping("/student/getByBranchAndSemester")
 public ActionResponse getStudentByBranchAndSemester(@RequestParam("branchCode") int branchCode,@RequestParam("semesterCode") int semesterCode)
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -606,8 +648,9 @@ try
 StudentDAO studentDAO=new StudentDAO();
 List<StudentView> students=studentDAO.getStudentsByBranchAndSemesterCode(branchCode,semesterCode);
 
-List<StudentViewBean> studentBeans=new ArrayList<>();
-studentBeans=gson.fromJson(gson.toJson(students),studentBeans.getClass());
+List<StudentViewBean> studentBeans=null;
+Type listType = new TypeToken<List<StudentViewBean>>(){}.getType();
+studentBeans=gson.fromJson(gson.toJson(students),listType);
 
 actionResponse.setSuccess(true);
 actionResponse.setException(null);
