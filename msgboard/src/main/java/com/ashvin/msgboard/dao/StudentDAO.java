@@ -422,6 +422,77 @@ System.out.println(sqlException);
 throw new DAOException("unable to get student record");
 }
 }
+public StudentView getStudentByEmailID(String emailID) throws DAOException
+{
+if(emailID==null || emailID.isBlank()) throw new DAOException("email id required");
+StudentView studentView;
+Branch branch;
+Semester semester;
+Connection connection=DAOConnection.getConnection();
+try
+{
+PreparedStatement preparedStatement;
+ResultSet resultSet;
+boolean valid;
+preparedStatement=connection.prepareStatement("select roll_number from student where email_id=?");
+preparedStatement.setString(1,emailID);
+resultSet=preparedStatement.executeQuery();
+valid=resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+connection.close();
+throw new DAOException("invalid email id: "+emailID);
+}
+
+String firstName;
+String lastName;
+String rollNumber;
+int branchCode;
+int semesterCode;
+String branchName;
+String semesterName;
+String sqlStatement="select student.first_name, student.last_name, student.roll_number, student.email_id,  branch.code as branch_code, branch.name as branch_name, semester.code as semester_code, semester.name as semester_name from student ";
+sqlStatement+="left join student_branch_mapping on student_branch_mapping.roll_number=student.roll_number ";
+sqlStatement+="left join student_semester_mapping on student_semester_mapping.roll_number=student.roll_number ";
+sqlStatement+="left join branch on branch.code=student_branch_mapping.branch_code ";
+sqlStatement+="left join semester on semester.code=student_semester_mapping.semester_code ";
+sqlStatement+="where student.email_id=?;";
+preparedStatement.setString(1,emailID);
+preparedStatement=connection.prepareStatement(sqlStatement);
+resultSet=preparedStatement.executeQuery();
+if(resultSet.next())
+{
+firstName=resultSet.getString("first_name").trim();
+lastName=resultSet.getString("last_name").trim();
+rollNumber=resultSet.getString("roll_number").trim();
+emailID=resultSet.getString("email_id").trim();
+branchCode=resultSet.getInt("branch_code");
+branchName=resultSet.getString("branch_name").trim();
+semesterCode=resultSet.getInt("semester_code");
+semesterName=resultSet.getString("semester_name").trim();
+branch=new Branch(branchCode,branchName);
+semester=new Semester(semesterCode,semesterName);
+studentView=new StudentView(firstName,lastName,rollNumber,emailID,branch,semester);
+}
+else
+{
+resultSet.close();
+preparedStatement.close();
+throw new DAOException("unable to get student record, not found");
+}
+resultSet.close();
+preparedStatement.close();
+connection.close();
+return studentView;
+}catch(SQLException sqlException)
+{
+System.out.println(sqlException);
+throw new DAOException("unable to get student record");
+}
+}
+
 public List<StudentView> getStudentsByBranchCode(int branchCode) throws DAOException
 {
 if(branchCode<=0) throw new DAOException("student(s) branch required");

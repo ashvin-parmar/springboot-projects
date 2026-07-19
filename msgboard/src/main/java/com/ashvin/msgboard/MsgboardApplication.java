@@ -52,12 +52,38 @@ System.out.println("getMessageBoardBean got called");
 MessageBoardBean messageBoardBean=new MessageBoardBean();
 try
 {
+List<StudentView> students=(new StudentDAO()).getStudents();
 List<Branch> branches=(new BranchDAO()).getBranches();
 List<Semester> semesters=(new SemesterDAO()).getSemesters();
+List<StudentViewBean> studentViewBeans=new ArrayList<>();
 List<BranchBean> branchBeans=new ArrayList<>();
 List<SemesterBean> semesterBeans=new ArrayList<>();
+StudentViewBean studentViewBean;
 BranchBean branchBean;
 SemesterBean semesterBean;
+Branch b;
+Semester s;
+for(StudentView student:students)
+{
+studentViewBean=new StudentViewBean();
+studentViewBean.setFirstName(student.getFirstName());
+studentViewBean.setLastName(student.getLastName());
+studentViewBean.setRollNumber(student.getRollNumber());
+studentViewBean.setEmailID(student.getEmailID());
+b=student.getBranch();
+branchBean=new BranchBean();
+branchBean.setCode(b.getCode());
+branchBean.setName(b.getName());
+
+s=student.getSemester();     //clone
+semesterBean=new SemesterBean();
+semesterBean.setCode(s.getCode());
+semesterBean.setName(s.getName());
+
+studentViewBean.setBranch(branchBean);
+studentViewBean.setSemester(semesterBean);
+studentViewBeans.add(studentViewBean);
+}
 for(Branch branch:branches)
 {
 branchBean=new BranchBean();
@@ -72,6 +98,7 @@ semesterBean.setCode(semester.getCode());
 semesterBean.setName(semester.getName());
 semesterBeans.add(semesterBean);
 }
+messageBoardBean.setStudents(studentViewBeans);
 messageBoardBean.setBranches(branchBeans);
 messageBoardBean.setSemesters(semesterBeans);
 }catch(DAOException daoException)

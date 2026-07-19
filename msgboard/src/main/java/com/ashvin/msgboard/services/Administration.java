@@ -24,7 +24,11 @@ public class Administration
 {
 @Autowired
 private DatabaseBean databaseBean;
+@Autowired
+private MessageBoardBean messageBoardBean;
+
 private Gson gson=new Gson();
+
 @GetMapping("/admin")
 public String adminIndex()
 {
@@ -75,6 +79,8 @@ System.out.println(exception.getMessage());
 return "InstallationFailed";
 }
 }
+
+
 @ResponseBody
 @PostMapping("/addBranch")
 public ActionResponse addBranch(BranchBean branchBean)
@@ -131,6 +137,7 @@ actionResponse.setResult(null);
 }
 return actionResponse;
 }
+
 @ResponseBody
 @PostMapping("/deleteBranch")
 public ActionResponse deleteBranch(BranchBean branchBean)
@@ -155,7 +162,7 @@ actionResponse.setResult(null);
 return actionResponse;
 }
 @ResponseBody
-@PostMapping("/getBranches")
+@GetMapping("/getBranches")
 public ActionResponse getBranches()
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -268,7 +275,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/getSemesters")
+@GetMapping("/getSemesters")
 public ActionResponse getSemesters()
 {
 ActionResponse actionResponse=new ActionResponse();
@@ -297,6 +304,125 @@ actionResponse.setResult(semesterBeans);
 return actionResponse;
 }
 
+
+@GetMapping("/students")
+public String getStudents(Model model,HttpServletRequest request)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+
+List<StudentView> students=null;
+try
+{
+students=(new StudentDAO()).getStudents();
+}catch(DAOException daoException)
+{
+students=new ArrayList<>();
+System.out.println(daoException);
+}
+List<StudentViewBean> studentViewBeans=new ArrayList<>();
+StudentViewBean studentViewBean;
+BranchBean branchBean;
+SemesterBean semesterBean;
+Branch b;
+Semester s;
+for(StudentView student:students)
+{
+studentViewBean=new StudentViewBean();
+studentViewBean.setFirstName(student.getFirstName());
+studentViewBean.setLastName(student.getLastName());
+studentViewBean.setRollNumber(student.getRollNumber());
+studentViewBean.setEmailID(student.getEmailID());
+b=student.getBranch();
+branchBean=new BranchBean();
+branchBean.setCode(b.getCode());
+branchBean.setName(b.getName());
+
+s=student.getSemester();     //clone
+semesterBean=new SemesterBean();
+semesterBean.setCode(s.getCode());
+semesterBean.setName(s.getName());
+
+studentViewBean.setBranch(branchBean);
+studentViewBean.setSemester(semesterBean);
+studentViewBeans.add(studentViewBean);
+}
+
+messageBoardBean.setStudents(studentViewBeans);
+model.addAttribute("messageBoardBean",messageBoardBean);
+return "Students";
+}
+@GetMapping("/home")
+public String home(HttpServletRequest request)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+return "Home";
+}
+@GetMapping("/notify")
+public String notification(HttpServletRequest request)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+return "Notification";
+}
+
+@GetMapping("/students/addForm")
+public String getAddForm(HttpServletRequest request)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+return "StudentAddForm";
+}
+
+@GetMapping("/students/editForm")
+public String getEditForm(@RequestParam("emailID")String emailID,HttpServletRequest request,Model model)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+try
+{
+StudentView student=(new StudentDAO()).getStudentByEmailID(emailID);
+StudentViewBean studentViewBean;
+BranchBean branchBean;
+SemesterBean semesterBean;
+Branch b;
+Semester s;
+
+studentViewBean=new StudentViewBean();
+studentViewBean.setFirstName(student.getFirstName());
+studentViewBean.setLastName(student.getLastName());
+studentViewBean.setRollNumber(student.getRollNumber());
+studentViewBean.setEmailID(student.getEmailID());
+b=student.getBranch();
+branchBean=new BranchBean();
+branchBean.setCode(b.getCode());
+branchBean.setName(b.getName());
+
+s=student.getSemester();     //clone
+semesterBean=new SemesterBean();
+semesterBean.setCode(s.getCode());
+semesterBean.setName(s.getName());
+
+studentViewBean.setBranch(branchBean);
+studentViewBean.setSemester(semesterBean);
+
+model.addAttribute("studentBean",studentViewBean);
+}catch(DAOException daoException)
+{
+NotificationBean notificationBean=new NotificationBean();
+notificationBean.setHeading("Student (update module)");
+notificationBean.setMessage(daoException.getMessage());
+notificationBean.setHasToGenerateButtons(true);
+notificationBean.setButtonOneText("OK");
+notificationBean.setButtonOneAction("/students");
+model.addAttribute("notification",notificationBean);
+return "forward:/notify";
+}
+return "StudentEditForm";
+}
+
+
 @PostMapping("/login")
 public String authenticateAdministrator(@RequestParam("username")String username,@RequestParam("password")String password,Model model,HttpServletRequest rq)
 {
@@ -315,6 +441,7 @@ if(administratorDAO.verifyUsernamePassword(administrator))
 {
 HttpSession ss=rq.getSession();
 ss.setAttribute("username",username);
+model.addAttribute("notification",new NotificationBean());
 return "Home";
 }
 model.addAttribute("error","invalid username/password");
@@ -328,8 +455,9 @@ return "AdminIndex";
 }
 @ResponseBody
 @PostMapping("/validateAdministratorLogin")
-public String validateAuthenticateAdministratorLogin(HttpSession ss,HttpServletRequest request,HttpServletResponse response)
+public String validateAuthenticateAdministratorLogin(HttpServletRequest request,HttpServletResponse response)
 {
+HttpSession ss=request.getSession(false);
 try
 {
 if(ss==null) request.getRequestDispatcher("/admin").forward(request, response);
@@ -346,11 +474,11 @@ System.out.println(servletException);
 return "";
 }
 
-@PostMapping("/logout")
+@GetMapping("/logout")
 public String logoutAdministrator(HttpSession ss)
 {
 if(ss!=null) ss.invalidate();
-return "/admin";
+return "forward:/admin";
 }
 
 
@@ -503,7 +631,7 @@ return actionResponse;
 }
 
 @ResponseBody
-@PostMapping("/student/getAll")
+@GetMapping("/student/getAll")
 public ActionResponse getAllStudent()
 {
 ActionResponse actionResponse=new ActionResponse();
