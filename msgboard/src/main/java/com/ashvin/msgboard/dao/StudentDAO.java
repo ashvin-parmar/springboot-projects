@@ -12,11 +12,11 @@ import com.ashvin.msgboard.utils.*;
  */
 public class StudentDAO 
 {
-private static long rn=100001;
 public void add(Student student) throws DAOException
 {
 if(student==null) throw new DAOException("student data required");
-String rollNumber;
+String rollNumber=null;
+rollNumber=student.getRollNumber();
 String firstName=student.getFirstName();
 String lastName=student.getLastName();
 String emailID=student.getEmailID();
@@ -25,6 +25,7 @@ String encryptedPassword;
 String passwordKey;
 int branchCode=student.getBranchCode();
 int semesterCode=student.getSemesterCode();
+if(rollNumber==null || rollNumber.isBlank()) throw new DAOException("student roll number required");
 if(firstName==null || firstName.isBlank()) throw new DAOException("student first name required");
 if(lastName==null || lastName.isBlank()) throw new DAOException("student last name required");
 if(emailID==null || emailID.isBlank()) throw new DAOException("student email id required");
@@ -39,6 +40,17 @@ try
 PreparedStatement preparedStatement;
 ResultSet resultSet;
 boolean valid;
+
+preparedStatement=connection.prepareStatement("select roll_number from student where roll_number=?");
+preparedStatement.setString(1,rollNumber);
+resultSet=preparedStatement.executeQuery();
+valid=!resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+throw new DAOException("roll number already exists");
+}
 
 preparedStatement=connection.prepareStatement("select roll_number from student where email_id=?");
 preparedStatement.setString(1,emailID);
@@ -73,7 +85,6 @@ if(!valid)
 throw new DAOException("student semester required");
 }
 
-rollNumber="RN"+(rn++);
 passwordKey=EncryptionUtility.getKey();
 encryptedPassword=EncryptionUtility.encrypt(password,passwordKey);
 
@@ -125,7 +136,7 @@ if(firstName==null || firstName.isBlank()) throw new DAOException("student first
 if(lastName==null || lastName.isBlank()) throw new DAOException("student last name required");
 if(emailID==null || emailID.isBlank()) throw new DAOException("student email id required");
 if(!ValidateUtility.isValidEmail(emailID)) throw new DAOException("invalid student email id");
-if(password==null || password.isBlank()) throw new DAOException("student password required");
+//if(password==null || password.isBlank()) throw new DAOException("student password required");
 if(semesterCode<=0) throw new DAOException("student semester required");
 if(branchCode<=0) throw new DAOException("student branch required");
 Connection connection=DAOConnection.getConnection();
@@ -134,6 +145,29 @@ try
 PreparedStatement preparedStatement;
 ResultSet resultSet;
 boolean valid;
+
+preparedStatement=connection.prepareStatement("select roll_number from student where roll_number=?");
+preparedStatement.setString(1,rollNumber);
+resultSet=preparedStatement.executeQuery();
+valid=resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+throw new DAOException("roll number does not exists");
+}
+
+preparedStatement=connection.prepareStatement("select roll_number from student where email_id=? and roll_number=?");
+preparedStatement.setString(1,emailID);
+preparedStatement.setString(2,rollNumber);
+resultSet=preparedStatement.executeQuery();
+valid=resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+throw new DAOException("email id does not exists");
+}
 
 preparedStatement=connection.prepareStatement("select code from branch where code=?");
 preparedStatement.setInt(1,branchCode);
@@ -157,7 +191,7 @@ if(!valid)
 throw new DAOException("student semester required");
 }
 
-
+/*
 preparedStatement=connection.prepareStatement("select password,password_key from student where roll_number=? and email_id=?");
 preparedStatement.setString(1,rollNumber);
 preparedStatement.setString(2,emailID);
@@ -178,12 +212,13 @@ if(!originalPassword.equals(password))
 {
 throw new DAOException("cannot update student, invalid password");
 }
+*/
 
-
-preparedStatement=connection.prepareStatement("update student set first_name=?, last_name=? where roll_number=?");
+preparedStatement=connection.prepareStatement("update student set first_name=?, last_name=? where roll_number=? and email_id=?");
 preparedStatement.setString(1,firstName);
 preparedStatement.setString(2,lastName);
 preparedStatement.setString(3,rollNumber);
+preparedStatement.setString(4,emailID);
 preparedStatement.executeUpdate();
 preparedStatement.close();
 
@@ -219,7 +254,7 @@ if(rollNumber==null || rollNumber.isBlank()) throw new DAOException("student rol
 
 if(emailID==null || emailID.isBlank()) throw new DAOException("student email id required");
 if(!ValidateUtility.isValidEmail(emailID)) throw new DAOException("invalid student email id");
-if(password==null || password.isBlank()) throw new DAOException("student password required");
+//if(password==null || password.isBlank()) throw new DAOException("student password required");
 Connection connection=DAOConnection.getConnection();
 try
 {
@@ -227,6 +262,32 @@ PreparedStatement preparedStatement;
 ResultSet resultSet;
 boolean valid;
 
+preparedStatement=connection.prepareStatement("select roll_number from student where roll_number=?");
+preparedStatement.setString(1,rollNumber);
+resultSet=preparedStatement.executeQuery();
+valid=resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+throw new DAOException("roll number does not exists");
+}
+
+preparedStatement=connection.prepareStatement("select roll_number from student where email_id=? and roll_number=?");
+preparedStatement.setString(1,emailID);
+preparedStatement.setString(2,rollNumber);
+resultSet=preparedStatement.executeQuery();
+valid=resultSet.next();
+resultSet.close();
+preparedStatement.close();
+if(!valid)
+{
+throw new DAOException("email id does not exists");
+}
+
+
+
+/*
 preparedStatement=connection.prepareStatement("select password,password_key from student where roll_number=? and email_id=?");
 preparedStatement.setString(1,rollNumber);
 preparedStatement.setString(2,emailID);
@@ -247,6 +308,7 @@ if(!originalPassword.equals(password))
 {
 throw new DAOException("cannot delete student, invalid password");
 }
+*/
 
 preparedStatement=connection.prepareStatement("delete from student where roll_number=? and email_id=?");
 preparedStatement.setString(1,rollNumber);
@@ -442,10 +504,8 @@ resultSet.close();
 preparedStatement.close();
 if(!valid)
 {
-connection.close();
 throw new DAOException("invalid email id: "+emailID);
 }
-
 String firstName;
 String lastName;
 String rollNumber;
@@ -453,14 +513,15 @@ int branchCode;
 int semesterCode;
 String branchName;
 String semesterName;
+
 String sqlStatement="select student.first_name, student.last_name, student.roll_number, student.email_id,  branch.code as branch_code, branch.name as branch_name, semester.code as semester_code, semester.name as semester_name from student ";
 sqlStatement+="left join student_branch_mapping on student_branch_mapping.roll_number=student.roll_number ";
 sqlStatement+="left join student_semester_mapping on student_semester_mapping.roll_number=student.roll_number ";
 sqlStatement+="left join branch on branch.code=student_branch_mapping.branch_code ";
 sqlStatement+="left join semester on semester.code=student_semester_mapping.semester_code ";
 sqlStatement+="where student.email_id=?;";
-preparedStatement.setString(1,emailID);
 preparedStatement=connection.prepareStatement(sqlStatement);
+preparedStatement.setString(1,emailID);
 resultSet=preparedStatement.executeQuery();
 if(resultSet.next())
 {
@@ -531,8 +592,8 @@ sqlStatement+="inner join branch on branch.code=student_branch_mapping.branch_co
 sqlStatement+="left join semester on semester.code=student_semester_mapping.semester_code ";
 sqlStatement+="where student_branch_mapping.branch_code=? ";
 sqlStatement+="order by student.roll_number;";
-preparedStatement.setInt(1,branchCode);
 preparedStatement=connection.prepareStatement(sqlStatement);
+preparedStatement.setInt(1,branchCode);
 resultSet=preparedStatement.executeQuery();
 while(resultSet.next())
 {
@@ -597,8 +658,8 @@ sqlStatement+="left join branch on branch.code=student_branch_mapping.branch_cod
 sqlStatement+="inner join semester on semester.code=student_semester_mapping.semester_code ";
 sqlStatement+="where student_semester_mapping.semester_code=? ";
 sqlStatement+="order by student.roll_number;";
-preparedStatement.setInt(1,semesterCode);
 preparedStatement=connection.prepareStatement(sqlStatement);
+preparedStatement.setInt(1,semesterCode);
 resultSet=preparedStatement.executeQuery();
 while(resultSet.next())
 {
@@ -674,8 +735,8 @@ sqlStatement+="inner join branch on branch.code=student_branch_mapping.branch_co
 sqlStatement+="inner join semester on semester.code=student_semester_mapping.semester_code ";
 sqlStatement+="where student_semester_mapping.semester_code=? ";
 sqlStatement+="order by student.roll_number;";
-preparedStatement.setInt(1,semesterCode);
 preparedStatement=connection.prepareStatement(sqlStatement);
+preparedStatement.setInt(1,semesterCode);
 resultSet=preparedStatement.executeQuery();
 while(resultSet.next())
 {

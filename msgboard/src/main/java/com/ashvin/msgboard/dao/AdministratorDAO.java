@@ -20,7 +20,6 @@ preparedStatement.setString(3,administratorPasswordKey);
 preparedStatement.executeUpdate();
 preparedStatement.close();
 connection.close();
-System.out.println("administrator info added to table");
 }catch(SQLException sqlException)
 {
 System.out.println(sqlException);

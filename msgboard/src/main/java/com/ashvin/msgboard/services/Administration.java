@@ -360,18 +360,21 @@ if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
 return "Home";
 }
 @GetMapping("/notify")
-public String notification(HttpServletRequest request)
+public String notification(HttpServletRequest request,Model model)
 {
 HttpSession ss=request.getSession(false);
 if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+// safety: if navigated to directly without a notification, show a blank one
+if(!model.containsAttribute("notification")) model.addAttribute("notification",new NotificationBean());
 return "Notification";
 }
 
 @GetMapping("/students/addForm")
-public String getAddForm(HttpServletRequest request)
+public String getAddForm(HttpServletRequest request,Model model)
 {
 HttpSession ss=request.getSession(false);
 if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+model.addAttribute("messageBoardBean",messageBoardBean);
 return "StudentAddForm";
 }
 
@@ -408,6 +411,7 @@ studentViewBean.setBranch(branchBean);
 studentViewBean.setSemester(semesterBean);
 
 model.addAttribute("studentBean",studentViewBean);
+model.addAttribute("messageBoardBean",messageBoardBean);
 }catch(DAOException daoException)
 {
 NotificationBean notificationBean=new NotificationBean();
@@ -417,7 +421,7 @@ notificationBean.setHasToGenerateButtons(true);
 notificationBean.setButtonOneText("OK");
 notificationBean.setButtonOneAction("/students");
 model.addAttribute("notification",notificationBean);
-return "forward:/notify";
+return "Notification";
 }
 return "StudentEditForm";
 }
@@ -490,11 +494,12 @@ ActionResponse actionResponse=new ActionResponse();
 boolean valid=true;
 String firstName=studentBean.getFirstName();
 String lastName=studentBean.getLastName();
-String rollNumber=null;
+String rollNumber=studentBean.getRollNumber();
 String emailID=studentBean.getEmailID();
 String password=studentBean.getPassword();
 int branchCode=studentBean.getBranchCode();
 int semesterCode=studentBean.getSemesterCode();
+if(rollNumber==null || rollNumber.isBlank()) valid=false;
 if(firstName==null || firstName.isBlank()) valid=false;
 if(lastName==null || lastName.isBlank()) valid=false;
 if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
@@ -513,6 +518,7 @@ try
 {
 StudentDAO studentDAO=new StudentDAO();
 Student student=new Student();
+student.setRollNumber(rollNumber);
 student.setFirstName(firstName);
 student.setLastName(lastName);
 student.setEmailID(emailID);
@@ -520,11 +526,10 @@ student.setPassword(password);
 student.setBranchCode(branchCode);
 student.setSemesterCode(semesterCode);
 studentDAO.add(student);
-rollNumber=student.getRollNumber();
 
 actionResponse.setSuccess(true);
 actionResponse.setException(null);
-actionResponse.setResult(rollNumber);
+actionResponse.setResult(null);
 }catch(DAOException daoException)
 {
 actionResponse.setSuccess(false);
@@ -551,7 +556,7 @@ if(firstName==null || firstName.isBlank()) valid=false;
 if(lastName==null || lastName.isBlank()) valid=false;
 if(rollNumber==null || rollNumber.isBlank()) valid=false;
 if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
-if(password==null || password.isBlank()) valid=false;
+//if(password==null || password.isBlank()) valid=false;     //this check is not done for administrator purpose, can be applied for specifically student purpose.
 if(branchCode<=0) valid=false;
 if(semesterCode<=0) valid=false;
 //More validation later on
@@ -599,7 +604,7 @@ String password=studentBean.getPassword();
 String emailID=studentBean.getEmailID();
 if(rollNumber==null || rollNumber.isBlank()) valid=false;
 if(emailID==null || emailID.isBlank() ) valid=false;        //also check for email validation later on
-if(password==null || password.isBlank()) valid=false;
+//if(password==null || password.isBlank()) valid=false;
 //More validation later on
 if(!valid)      // error management is not perfect, changes later on
 {
