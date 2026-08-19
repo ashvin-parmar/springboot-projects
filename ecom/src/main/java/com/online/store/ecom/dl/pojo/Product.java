@@ -17,7 +17,7 @@ public class Product
 //@GeneratedValue(strategy=GenerationType.AUTO)
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long code;
-@Column(name="name")
+@Column(name="name",nullable=false,unique=true)
 private String name;
 @Column(name="price")
 private BigDecimal price;
