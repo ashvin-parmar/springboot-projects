@@ -8,27 +8,28 @@ import java.math.*;
  * @since 2026-08-07
  * Description: 
  */
-@Entity
-public class Customer 
+@Entity(name="customer")
+public class Customer
 {
 @Column(name="code")
 @Id
-@GeneratedValue(strategy=GenerationType.AUTO)
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+//@GeneratedValue(strategy=GenerationType.AUTO)
 private Long code;
 @Column(name="name")
 private String name;
-@Column(name="email_id",nullable=false,unique=true)
+@Column(name="email_id",unique=true)
 private String emailID;
-@Column(name="password",nullable=false)
+@Column(name="password")
 private String password;
-@Column(name="password_key",nullable=false)
+@Column(name="password_key")
 private String passwordKey;
 @Column(name="date_of_registration")
 private java.sql.Date dateOfRegistration;
 public Customer()
 {
 }
-public Customer(String name,String emailID,String password,String passwordKey)
+public Customer(String name,String emailID,String password,String passwordKey,java.sql.Date dateOfRegistration)
 {
 this.name=name;
 this.emailID=emailID;

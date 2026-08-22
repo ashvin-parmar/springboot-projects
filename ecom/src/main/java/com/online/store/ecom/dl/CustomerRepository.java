@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.*;
  * @since 2026-08-07
  * Description: 
  */
+import java.util.*;
 public interface CustomerRepository extends CrudRepository<Customer,Long>
 {
-public Customer getByEmailID(String emailID);
+public Optional<Customer> findByEmailID(String emailID);
+public Boolean existsByEmailID(String emailID);
+
 }
 

@@ -9,7 +9,7 @@ import java.math.*;
  * Description: 
  */
 
-@Entity
+@Entity(name="product")
 public class Product
 {
 @Column(name="code")

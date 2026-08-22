@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.*;
 import com.online.store.ecom.dl.pojo.*;
 import com.online.store.ecom.dl.*;
 import com.online.store.ecom.beans.*;
-
+import java.util.*;
 /**
  * @author Ashvin
  * @since 2026-08-19
  * Description: 
  */
 @Controller
-
 public class FeedBackService 
 {
 @Autowired
@@ -41,7 +40,7 @@ Product product=null;
 Customer customer=null;
 
 if(productResult.isPresent()) product=productResult.get();
-if(customerResult.isPresent()) customer=productResult.get(); 
+if(customerResult.isPresent()) customer=customerResult.get(); 
 
 
 FeedBack feedBack=new FeedBack(feedBackMessage,sqlGivenOn,customer,product);

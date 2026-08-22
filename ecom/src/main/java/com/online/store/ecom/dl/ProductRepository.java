@@ -10,5 +10,6 @@ import com.online.store.ecom.dl.pojo.*;
  */
 public interface ProductRepository extends CrudRepository<Product,Long>
 {
+public java.util.Optional<Product> findByName(String name);
 }
 
