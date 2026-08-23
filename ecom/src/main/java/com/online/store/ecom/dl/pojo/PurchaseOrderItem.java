@@ -17,6 +17,9 @@ private PurchaseOrderItemKey purchaseOrderItemKey;
 private Integer quantity;
 @Column(name="price")
 private BigDecimal price;
+public PurchaseOrderItem()
+{
+}
 public PurchaseOrderItem(PurchaseOrderItemKey purchaseOrderItemKey,Integer quantity,BigDecimal price)
 {
 this.purchaseOrderItemKey=purchaseOrderItemKey;

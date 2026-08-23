@@ -6,6 +6,8 @@ package com.online.store.ecom.dl.pojo;
  * Description: 
  */
 import jakarta.persistence.*;
+import java.util.*;
+
 
 @Embeddable
 public class PurchaseOrderItemKey implements java.io.Serializable
@@ -37,6 +39,16 @@ this.orderID=orderID;
 public Long getOrderID()
 {
 return this.orderID;
+}
+public boolean equals(Object other)
+{
+if(!(other instanceof PurchaseOrderItemKey)) return false;
+PurchaseOrderItemKey purchaseOrderItemKey=(PurchaseOrderItemKey)other;
+return this.orderID.equals(purchaseOrderItemKey.getOrderID()) && this.productCode.equals(purchaseOrderItemKey.getProductCode());
+}
+public int hashCode()
+{
+return Objects.hash(this.orderID,this.productCode);
 }
 }
 

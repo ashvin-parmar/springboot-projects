@@ -12,7 +12,8 @@ public class PurchaseOrder implements java.io.Serializable
 {
 @Id
 @Column(name="id")
-@GeneratedValue(strategy=GenerationType.AUTO)
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+//@GeneratedValue(strategy=GenerationType.AUTO)
 private Long id;
 @ManyToOne()
 @JoinColumn(name="customer_code",referencedColumnName="code")
@@ -30,6 +31,14 @@ public PurchaseOrder(Customer customer,java.sql.Date orderDate,BigDecimal totalA
 this.customer=customer;
 this.orderDate=orderDate;
 this.totalAmount=totalAmount;
+}
+public void setId(Long id)
+{
+this.id=id;
+}
+public Long getId()
+{
+return this.id;
 }
 public void setCustomer(Customer customer)
 {
