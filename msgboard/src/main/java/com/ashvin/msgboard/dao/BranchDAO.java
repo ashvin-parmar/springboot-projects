@@ -171,4 +171,32 @@ throw new DAOException("unable to get branch record");
 }
 return branches;
 }
+public Branch getBranchByCode(int code) throws DAOException
+{
+Branch branch=null;
+String name;
+Connection connection=DAOConnection.getConnection();
+try
+{
+PreparedStatement preparedStatement=connection.prepareStatement("select name from branch where code=?");
+preparedStatement.setInt(1,code);
+ResultSet resultSet=preparedStatement.executeQuery();
+if(resultSet.next())
+{
+name=resultSet.getString("name").trim();
+branch=new Branch();
+branch.setCode(code);
+branch.setName(name);
+}
+resultSet.close();
+preparedStatement.close();
+connection.close();
+}catch(SQLException sqlException)
+{
+System.out.println(sqlException);
+throw new DAOException("unable to get branch record");
+}
+return branch;
+}
+
 }

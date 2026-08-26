@@ -427,6 +427,74 @@ return "StudentEditForm";
 }
 
 
+
+@GetMapping("/branches")
+public String getBranches(Model model,HttpServletRequest request)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+
+List<Branch> branches=null;
+try
+{
+branches=(new BranchDAO()).getBranches();
+}catch(DAOException daoException)
+{
+branches=new ArrayList<>();
+// System.out.println(daoException);
+}
+List<BranchBean> branchBeans=new ArrayList<>();
+BranchBean branchBean;
+for(Branch branch:branches)
+{
+branchBean=new BranchBean();
+branchBean.setCode(branch.getCode());
+branchBean.setName(branch.getName());
+branchBeans.add(branchBean);
+}
+messageBoardBean.setBranches(branchBeans);
+model.addAttribute("messageBoardBean",messageBoardBean);
+return "Branches";
+}
+
+@GetMapping("/branches/addForm")
+public String getBranchAddForm(HttpServletRequest request,Model model)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+//model.addAttribute("messageBoardBean",messageBoardBean);
+return "BranchAddForm";
+}
+
+@GetMapping("/branches/editForm")
+public String getBranchEditForm(@RequestParam("branchCode")Integer code,HttpServletRequest request,Model model)
+{
+HttpSession ss=request.getSession(false);
+if(ss==null || ss.getAttribute("username")==null) return "forward:/admin";
+try
+{
+Branch branch=(new BranchDAO()).getBranchByCode(code);
+BranchBean branchBean;
+branchBean=new BranchBean();
+branchBean.setCode(branch.getCode());
+branchBean.setName(branch.getName());
+
+model.addAttribute("branchBean",branchBean);
+model.addAttribute("messageBoardBean",messageBoardBean);
+}catch(DAOException daoException)
+{
+NotificationBean notificationBean=new NotificationBean();
+notificationBean.setHeading("Branch (update module)");
+notificationBean.setMessage(daoException.getMessage());
+notificationBean.setHasToGenerateButtons(true);
+notificationBean.setButtonOneText("OK");
+notificationBean.setButtonOneAction("/branches");
+model.addAttribute("notification",notificationBean);
+return "Notification";
+}
+return "BranchEditForm";
+}
+
 @PostMapping("/login")
 public String authenticateAdministrator(@RequestParam("username")String username,@RequestParam("password")String password,Model model,HttpServletRequest rq)
 {
