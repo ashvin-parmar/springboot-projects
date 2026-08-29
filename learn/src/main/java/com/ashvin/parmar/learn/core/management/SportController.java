@@ -14,6 +14,7 @@ private Couch couch;
 @Autowired
 public SportController(@Qualifier("cricketCouchManagement")Couch couch)    
 {
+System.out.println("Sport Controller initialized");
 this.couch=couch;
 }
 

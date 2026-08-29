@@ -5,6 +5,10 @@ import org.springframework.stereotype.*;
 @Component("cricketCouchManagement")
 public class CricketCouch implements Couch 
 {
+public CricketCouch()
+{
+System.out.println("Cricket Couch initialized");
+}
 @Override
 public String getDailyWorkout()
 {

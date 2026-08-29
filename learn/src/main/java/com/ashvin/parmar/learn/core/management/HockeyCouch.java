@@ -5,8 +5,13 @@ import org.springframework.context.annotation.*;
 
 @Component("hockeyCouchManagement")
 @Primary        //Only one from all Couch implements may be set as primary. It treat as default selection for Couch type of Component selection
+@Lazy(false)
 public class HockeyCouch implements Couch 
 {
+public HockeyCouch()
+{
+System.out.println("Hockey couch initialized");
+}
 @Override
 public String getDailyWorkout()
 {
