@@ -54,6 +54,7 @@
       <artifactId>spring-boot-devtools</artifactId>
     </dependency>
 
+    <!--    For right now, we have learn, not need right now
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
@@ -63,7 +64,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
-
+    -->
 
 
     <!--
