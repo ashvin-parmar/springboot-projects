@@ -16,7 +16,7 @@ private Couch couch;
 
 //We have specified for 'cricketCouchManagement' bean from Spring container, means it will be selected for processing
 @Autowired
-public SportController(@Qualifier("cricketCouchManagement")Couch couch)    
+public SportController(@Qualifier("swimCouchManagement")Couch couch)    
 {
 System.out.println("Sport Controller initialized");
 this.couch=couch;
